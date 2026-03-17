@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="km">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Dashboard — MD Quiz</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
+<style>
+  :root {
+    --navy:  #0a1628;
+    --teal:  #0e9f8e;
+    --teal2: #0cc5b0;
+    --gold:  #c9a84c;
+    --muted: #8a9ab0;
+    --card:  #111f35;
+    --card2: #162238;
+    --success: #2fc87a;
+  }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { font-family:'DM Sans',sans-serif; background:var(--navy); color:#fff; min-height:100vh; }
+
+  nav {
+    display:flex; justify-content:space-between; align-items:center;
+    padding:1.2rem 2rem;
+    border-bottom:1px solid rgba(255,255,255,0.07);
+  }
+  .logo { font-family:'Playfair Display',serif; font-size:1.4rem; color:var(--teal2); }
+  .logo span { color:var(--gold); }
+  .nav-right { display:flex; align-items:center; gap:1rem; }
+  .user-name { font-size:0.88rem; color:var(--muted); }
+  .btn-logout { background:transparent; border:1px solid rgba(255,255,255,0.15); color:var(--muted); padding:0.4rem 1rem; border-radius:8px; cursor:pointer; font-size:0.82rem; font-family:'DM Sans',sans-serif; transition:all 0.2s; }
+  .btn-logout:hover { border-color:rgba(255,255,255,0.3); color:#fff; }
+
+  .container { max-width:960px; margin:0 auto; padding:2.5rem 1.5rem; }
+
+  /* Welcome Banner */
+  .welcome {
+    background: var(--card);
+    border:1px solid rgba(255,255,255,0.08);
+    border-radius:16px;
+    padding:1.8rem 2rem;
+    margin-bottom:2rem;
+    display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:1rem;
+  }
+  .welcome h2 { font-family:'Playfair Display',serif; font-size:1.5rem; }
+  .welcome p { color:var(--muted); font-size:0.9rem; margin-top:0.3rem; }
+
+  /* Premium Badge */
+  .badge-free {
+    background:rgba(201,168,76,0.12);
+    border:1px solid rgba(201,168,76,0.35);
+    color:var(--gold);
+    padding:0.4rem 1rem;
+    border-radius:50px;
+    font-size:0.8rem;
+    font-weight:500;
+  }
+  .badge-premium {
+    background:rgba(14,159,142,0.15);
+    border:1px solid var(--teal);
+    color:var(--teal2);
+    padding:0.4rem 1rem;
+    border-radius:50px;
+    font-size:0.8rem;
+    font-weight:500;
+  }
+
+  /* Subjects Grid */
+  .section-title { font-size:1rem; color:var(--muted); margin-bottom:1.2rem; letter-spacing:0.5px; text-transform:uppercase; font-size:0.78rem; }
+  .grid { display:grid; grid-template-columns:repeat(auto-fit, minmax(170px,1fr)); gap:1rem; margin-bottom:2.5rem; }
+  .subject-card {
+    background:var(--card);
+    border:1px solid rgba(255,255,255,0.07);
+    border-radius:14px;
+    padding:1.4rem 1rem;
+    text-align:center;
+    cursor:pointer;
+    transition:all 0.2s;
+    position:relative;
+    overflow:hidden;
+  }
+  .subject-card:hover { border-color:var(--teal); transform:translateY(-3px); box-shadow:0 8px 24px rgba(14,159,142,0.12); }
+  .subject-card.locked { opacity:0.65; cursor:default; }
+  .subject-card.locked:hover { transform:none; box-shadow:none; border-color:rgba(255,255,255,0.07); }
+  .s-icon { font-size:2rem; margin-bottom:0.7rem; }
+  .s-name { font-weight:500; font-size:0.92rem; margin-bottom:0.25rem; }
+  .s-count { font-size:0.75rem; color:var(--muted); }
+  .lock-overlay {
+    position:absolute; top:0.6rem; right:0.6rem;
+    font-size:0.9rem; opacity:0.5;
+  }
+  .free-chip {
+    display:inline-block;
+    background:rgba(201,168,76,0.12);
+    color:var(--gold);
+    font-size:0.68rem;
+    padding:0.15rem 0.5rem;
+    border-radius:50px;
+    margin-top:0.4rem;
+    border:1px solid rgba(201,168,76,0.2);
+  }
+
+  /* Upgrade Banner */
+  .upgrade-banner {
+    background: linear-gradient(135deg, #0e2a3a 0%, #0a1f30 100%);
+    border:1.5px solid var(--teal);
+    border-radius:16px;
+    padding:2rem;
+    display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:1.2rem;
+    margin-bottom:2rem;
+    position:relative;
+    overflow:hidden;
+  }
+  .upgrade-banner::before {
+    content:'';
+    position:absolute; top:0; left:0; right:0; height:2px;
+    background:linear-gradient(90deg, var(--teal), var(--gold));
+  }
+  .upgrade-text h3 { font-family:'Playfair Display',serif; font-size:1.3rem; margin-bottom:0.4rem; }
+  .upgrade-text p { color:var(--muted); font-size:0.88rem; }
+  .btn-upgrade {
+    background:var(--teal);
+    color:#fff;
+    border:none;
+    padding:0.75rem 1.8rem;
+    border-radius:10px;
+    font-size:0.95rem;
+    font-family:'DM Sans',sans-serif;
+    font-weight:500;
+    cursor:pointer;
+    transition:all 0.2s;
+    white-space:nowrap;
+  }
+  .btn-upgrade:hover { background:var(--teal2); transform:translateY(-1px); }
+
+  /* Hidden if premium */
+  .premium-only { display:none; }
+
+  @media(max-width:600px) {
+    nav { padding:1rem; }
+    .container { padding:1.5rem 1rem; }
+    .welcome { flex-direction:column; }
+  }
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="logo">MD<span>Quiz</span></div>
+  <div class="nav-right">
+    <span class="user-name" id="userName">Loading...</span>
+    <button class="btn-logout" onclick="logout()">Logout</button>
+  </div>
+</nav>
+
+<div class="container">
+
+  <!-- Welcome -->
+  <div class="welcome">
+    <div>
+      <h2>សួស្តី, <span id="greetName">...</span> 👋</h2>
+      <p id="statusText">Free Account — Upgrade ដើម្បី Unlock គ្រប់ Subjects</p>
+    </div>
+    <span id="planBadge" class="badge-free">FREE</span>
+  </div>
+
+  <!-- Upgrade Banner (hidden if premium) -->
+  <div class="upgrade-banner" id="upgradeBanner">
+    <div class="upgrade-text">
+      <h3>🔓 Unlock Quiz ទាំងអស់</h3>
+      <p>$5.00 ប្រើបាន ១ ឆ្នាំ · Renew ឆ្នាំបន្ទាប់ $2 ប៉ុណ្ណោះ</p>
+    </div>
+    <button class="btn-upgrade" onclick="alert('KHQR Payment — Coming soon!')">
+      Upgrade — $5.00
+    </button>
+  </div>
+
+  <!-- Subjects -->
+  <p class="section-title">Quiz Subjects</p>
+  <div class="grid">
+    <div class="subject-card" onclick="startQuiz('basic')">
+      <div class="s-icon">🧬</div>
+      <div class="s-name">Basic Science</div>
+      <div class="s-count">MCQ ច្រើន</div>
+      <div class="free-chip">10 Free</div>
+    </div>
+    <div class="subject-card locked" id="card-medicine">
+      <span class="lock-overlay">🔒</span>
+      <div class="s-icon">💊</div>
+      <div class="s-name">Medicine</div>
+      <div class="s-count">Premium only</div>
+    </div>
+    <div class="subject-card locked" id="card-surgery">
+      <span class="lock-overlay">🔒</span>
+      <div class="s-icon">🔪</div>
+      <div class="s-name">Surgery</div>
+      <div class="s-count">Premium only</div>
+    </div>
+    <div class="subject-card locked" id="card-gyneco">
+      <span class="lock-overlay">🔒</span>
+      <div class="s-icon">🤰</div>
+      <div class="s-name">Gyneco-Obs</div>
+      <div class="s-count">Premium only</div>
+    </div>
+    <div class="subject-card locked" id="card-pediatry">
+      <span class="lock-overlay">🔒</span>
+      <div class="s-icon">👶</div>
+      <div class="s-name">Pediatry</div>
+      <div class="s-count">Premium only</div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+  const API = 'https://sudo-suspend-1-service.onrender.com'; // ← Change this!
+
+  // Check auth
+  const token = localStorage.getItem('token');
+  const user  = JSON.parse(localStorage.getItem('user') || 'null');
+
+  if (!token || !user) {
+    window.location.href = 'login.html';
+  }
+
+  // Populate UI
+  document.getElementById('greetName').textContent = user?.name || 'User';
+  document.getElementById('userName').textContent  = user?.email || '';
+
+  if (user?.isPremium) {
+    // Premium user — show all subjects
+    document.getElementById('planBadge').textContent = '✅ PREMIUM';
+    document.getElementById('planBadge').className   = 'badge-premium';
+    document.getElementById('statusText').textContent = 'Premium Account — Subjects ទាំងអស់ Unlocked';
+    document.getElementById('upgradeBanner').style.display = 'none';
+
+    ['medicine','surgery','gyneco','pediatry'].forEach(s => {
+      const card = document.getElementById(`card-${s}`);
+      card.classList.remove('locked');
+      card.querySelector('.lock-overlay')?.remove();
+      card.onclick = () => startQuiz(s);
+    });
+  }
+
+  function startQuiz(subject) {
+    alert(`🚧 Quiz "${subject}" — Coming in Phase 2!`);
+  }
+
+  function logout() {
+    localStorage.removeItem('token');
+    localStorage.removeItem('user');
+    window.location.href = 'index.html';
+  }
+
+  // Verify token with backend (optional refresh)
+  async function verifyToken() {
+    try {
+      const res = await fetch(`${API}/api/profile`, {
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      if (!res.ok) {
+        logout();
+        return;
+      }
+      const data = await res.json();
+      // Update local storage with fresh data
+      localStorage.setItem('user', JSON.stringify(data.user));
+    } catch(e) {
+      // Silent fail — offline mode ok
+    }
+  }
+
+  verifyToken();
+</script>
+</body>
+</html>
