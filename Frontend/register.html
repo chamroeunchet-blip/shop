@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="km">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>ចុះឈ្មោះ — MD Quiz</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
+<style>
+  :root {
+    --navy:  #0a1628;
+    --teal:  #0e9f8e;
+    --teal2: #0cc5b0;
+    --gold:  #c9a84c;
+    --muted: #8a9ab0;
+    --card:  #111f35;
+    --error: #e05c5c;
+    --success: #2fc87a;
+  }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--navy);
+    color: #fff;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem 1.2rem;
+  }
+  .logo {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.6rem;
+    color: var(--teal2);
+    margin-bottom: 2rem;
+    text-decoration: none;
+  }
+  .logo span { color: var(--gold); }
+  .box {
+    background: var(--card);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 18px;
+    padding: 2.5rem 2rem;
+    width: 100%;
+    max-width: 420px;
+  }
+  h2 {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.7rem;
+    margin-bottom: 0.4rem;
+  }
+  .sub { color: var(--muted); font-size: 0.88rem; margin-bottom: 2rem; }
+
+  .field { margin-bottom: 1.2rem; }
+  label { display: block; font-size: 0.82rem; color: var(--muted); margin-bottom: 0.4rem; letter-spacing: 0.3px; }
+  input {
+    width: 100%;
+    background: rgba(255,255,255,0.05);
+    border: 1.5px solid rgba(255,255,255,0.1);
+    border-radius: 10px;
+    padding: 0.75rem 1rem;
+    color: #fff;
+    font-size: 0.95rem;
+    font-family: 'DM Sans', sans-serif;
+    outline: none;
+    transition: border 0.2s;
+  }
+  input:focus { border-color: var(--teal); }
+  input::placeholder { color: rgba(255,255,255,0.2); }
+
+  .btn {
+    width: 100%;
+    padding: 0.85rem;
+    background: var(--teal);
+    color: #fff;
+    border: none;
+    border-radius: 10px;
+    font-size: 1rem;
+    font-family: 'DM Sans', sans-serif;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+    margin-top: 0.5rem;
+  }
+  .btn:hover { background: var(--teal2); transform: translateY(-1px); }
+  .btn:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
+
+  .msg {
+    padding: 0.75rem 1rem;
+    border-radius: 8px;
+    font-size: 0.88rem;
+    margin-bottom: 1.2rem;
+    display: none;
+  }
+  .msg.error   { background: rgba(224,92,92,0.15); border: 1px solid rgba(224,92,92,0.3); color: var(--error); }
+  .msg.success { background: rgba(47,200,122,0.12); border: 1px solid rgba(47,200,122,0.3); color: var(--success); }
+  .msg.show { display: block; }
+
+  .footer-link { text-align: center; margin-top: 1.5rem; font-size: 0.88rem; color: var(--muted); }
+  .footer-link a { color: var(--teal2); text-decoration: none; }
+  .footer-link a:hover { text-decoration: underline; }
+
+  .spinner {
+    display: inline-block;
+    width: 16px; height: 16px;
+    border: 2px solid rgba(255,255,255,0.3);
+    border-top-color: #fff;
+    border-radius: 50%;
+    animation: spin 0.7s linear infinite;
+    vertical-align: middle;
+    margin-right: 6px;
+    display: none;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+</style>
+</head>
+<body>
+
+<a href="index.html" class="logo">MD<span>Quiz</span></a>
+
+<div class="box">
+  <h2>ចុះឈ្មោះ</h2>
+  <p class="sub">បង្កើត Account ឥតគិតថ្លៃ — ចាប់ផ្តើម Quiz ភ្លាម</p>
+
+  <div class="msg" id="msg"></div>
+
+  <div class="field">
+    <label>ឈ្មោះ</label>
+    <input type="text" id="name" placeholder="ឈ្មោះពេញ"/>
+  </div>
+  <div class="field">
+    <label>Email</label>
+    <input type="email" id="email" placeholder="your@email.com"/>
+  </div>
+  <div class="field">
+    <label>Password</label>
+    <input type="password" id="password" placeholder="យ៉ាងហោចណាស់ 6 តួអក្សរ"/>
+  </div>
+  <div class="field">
+    <label>Confirm Password</label>
+    <input type="password" id="confirm" placeholder="បញ្ចូល Password ម្តងទៀត"/>
+  </div>
+
+  <button class="btn" id="registerBtn" onclick="register()">
+    <span class="spinner" id="spin"></span>
+    ចុះឈ្មោះ
+  </button>
+
+  <div class="footer-link">
+    មាន Account រួចហើយ? <a href="login.html">Login នៅទីនេះ</a>
+  </div>
+</div>
+
+<script>
+  // ⚠️ Change this to your Render.com backend URL after deploy
+  const API = 'https://your-backend.onrender.com';
+
+  async function register() {
+    const name     = document.getElementById('name').value.trim();
+    const email    = document.getElementById('email').value.trim();
+    const password = document.getElementById('password').value;
+    const confirm  = document.getElementById('confirm').value;
+    const btn      = document.getElementById('registerBtn');
+    const spin     = document.getElementById('spin');
+    const msg      = document.getElementById('msg');
+
+    // Client-side validation
+    if (!name || !email || !password || !confirm) {
+      return showMsg('error', 'សូម​បំពេញ​ព័ត៌មាន​ទាំងអស់');
+    }
+    if (password !== confirm) {
+      return showMsg('error', 'Password មិនដូចគ្នា');
+    }
+    if (password.length < 6) {
+      return showMsg('error', 'Password ត្រូវការ​យ៉ាងហោចណាស់ ៦ តួអក្សរ');
+    }
+
+    // Loading state
+    btn.disabled = true;
+    spin.style.display = 'inline-block';
+    msg.className = 'msg';
+
+    try {
+      const res = await fetch(`${API}/api/register`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name, email, password })
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        showMsg('error', data.error || 'មានបញ្ហា សូមព្យាយាម​ម្តងទៀត');
+        return;
+      }
+
+      // Save token
+      localStorage.setItem('token', data.token);
+      localStorage.setItem('user', JSON.stringify(data.user));
+
+      showMsg('success', '✅ Account បានបង្កើត! កំពុង redirect...');
+      setTimeout(() => window.location.href = 'dashboard.html', 1500);
+
+    } catch (err) {
+      showMsg('error', 'មិន​អាច​ភ្ជាប់​ Server — សូម​ព្យាយាម​ម្តង​ទៀត');
+    } finally {
+      btn.disabled = false;
+      spin.style.display = 'none';
+    }
+  }
+
+  function showMsg(type, text) {
+    const msg = document.getElementById('msg');
+    msg.textContent = text;
+    msg.className = `msg ${type} show`;
+  }
+
+  // Enter key support
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Enter') register();
+  });
+</script>
+</body>
+</html>
