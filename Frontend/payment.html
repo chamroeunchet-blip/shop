@@ -1,0 +1,397 @@
+<!DOCTYPE html>
+<html lang="km">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>ទូទាត់ — MD Quiz</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
+<script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
+<style>
+  :root {
+    --navy:    #0a1628;
+    --teal:    #0e9f8e;
+    --teal2:   #0cc5b0;
+    --gold:    #c9a84c;
+    --muted:   #8a9ab0;
+    --card:    #111f35;
+    --success: #2fc87a;
+    --error:   #e05c5c;
+  }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { font-family:'DM Sans',sans-serif; background:var(--navy); color:#fff; min-height:100vh; }
+
+  nav {
+    display:flex; justify-content:space-between; align-items:center;
+    padding:1.2rem 2rem;
+    border-bottom:1px solid rgba(255,255,255,0.07);
+  }
+  .logo { font-family:'Playfair Display',serif; font-size:1.4rem; color:var(--teal2); text-decoration:none; }
+  .logo span { color:var(--gold); }
+
+  .container { max-width:600px; margin:0 auto; padding:3rem 1.5rem; }
+
+  h1 { font-family:'Playfair Display',serif; font-size:1.8rem; margin-bottom:0.5rem; text-align:center; }
+  .subtitle { color:var(--muted); text-align:center; margin-bottom:2.5rem; font-size:0.95rem; }
+
+  /* Steps */
+  .steps { display:flex; justify-content:center; gap:0; margin-bottom:2.5rem; }
+  .step {
+    display:flex; flex-direction:column; align-items:center; gap:0.4rem;
+    flex:1; max-width:140px; position:relative;
+  }
+  .step:not(:last-child)::after {
+    content:'';
+    position:absolute; top:16px; left:calc(50% + 20px);
+    width:calc(100% - 40px); height:1px;
+    background:rgba(255,255,255,0.15);
+  }
+  .step.done::after { background:var(--teal); }
+  .step-num {
+    width:32px; height:32px; border-radius:50%;
+    background:rgba(255,255,255,0.1); border:1.5px solid rgba(255,255,255,0.2);
+    display:flex; align-items:center; justify-content:center;
+    font-size:0.82rem; font-weight:500; position:relative; z-index:1;
+  }
+  .step.active .step-num { background:var(--teal); border-color:var(--teal); }
+  .step.done   .step-num { background:var(--success); border-color:var(--success); }
+  .step-label { font-size:0.72rem; color:var(--muted); text-align:center; }
+  .step.active .step-label { color:var(--teal2); }
+
+  /* QR Card */
+  .qr-card {
+    background:var(--card);
+    border:1.5px solid rgba(255,255,255,0.08);
+    border-radius:20px;
+    padding:2rem;
+    text-align:center;
+    margin-bottom:1.5rem;
+  }
+  .qr-card.highlight { border-color:var(--teal); }
+
+  .amount-display {
+    margin-bottom:1.5rem;
+  }
+  .amount-big {
+    font-family:'Playfair Display',serif;
+    font-size:3rem;
+    color:var(--teal2);
+    line-height:1;
+  }
+  .amount-big span { font-size:1.4rem; vertical-align:top; margin-top:0.7rem; display:inline-block; }
+  .amount-note { color:var(--muted); font-size:0.82rem; margin-top:0.4rem; }
+
+  /* QR Code area */
+  .qr-wrap {
+    background:#fff;
+    border-radius:16px;
+    padding:1.2rem;
+    display:inline-block;
+    margin:1rem 0;
+    position:relative;
+  }
+  .qr-wrap img { display:block; width:180px; height:180px; }
+  .qr-loader {
+    width:180px; height:180px;
+    display:flex; align-items:center; justify-content:center;
+    background:#f5f5f5; border-radius:8px;
+  }
+
+  /* Bill Ref */
+  .bill-ref {
+    background:rgba(14,159,142,0.1);
+    border:1px solid rgba(14,159,142,0.3);
+    border-radius:10px;
+    padding:0.8rem 1.2rem;
+    margin:1rem 0;
+    font-size:0.85rem;
+  }
+  .bill-ref strong { color:var(--teal2); font-family:monospace; font-size:0.95rem; }
+
+  /* Instructions */
+  .instructions {
+    background:rgba(255,255,255,0.03);
+    border-radius:12px;
+    padding:1.2rem 1.5rem;
+    text-align:left;
+    margin-bottom:1.5rem;
+  }
+  .instructions h3 { font-size:0.88rem; color:var(--muted); margin-bottom:0.8rem; text-transform:uppercase; letter-spacing:0.5px; }
+  .step-list { list-style:none; display:flex; flex-direction:column; gap:0.6rem; }
+  .step-list li { font-size:0.9rem; display:flex; gap:0.7rem; align-items:flex-start; }
+  .step-list li .num {
+    min-width:22px; height:22px; border-radius:50%;
+    background:var(--teal); color:#fff;
+    font-size:0.72rem; display:flex; align-items:center; justify-content:center;
+    margin-top:1px; flex-shrink:0;
+  }
+
+  /* Status Banner */
+  .status-banner {
+    border-radius:12px;
+    padding:1rem 1.5rem;
+    text-align:center;
+    font-size:0.95rem;
+    margin-bottom:1.5rem;
+    display:none;
+  }
+  .status-banner.waiting {
+    background:rgba(201,168,76,0.12);
+    border:1px solid rgba(201,168,76,0.3);
+    color:var(--gold);
+    display:block;
+  }
+  .status-banner.success {
+    background:rgba(47,200,122,0.15);
+    border:1px solid rgba(47,200,122,0.4);
+    color:var(--success);
+    display:block;
+  }
+  .status-banner.error {
+    background:rgba(224,92,92,0.12);
+    border:1px solid rgba(224,92,92,0.3);
+    color:var(--error);
+    display:block;
+  }
+
+  /* Pulse animation for waiting */
+  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.5} }
+  .pulse { animation:pulse 1.5s ease-in-out infinite; }
+
+  /* Spinner */
+  @keyframes spin { to{transform:rotate(360deg)} }
+  .spinner { width:20px;height:20px;border:2px solid rgba(255,255,255,0.2);border-top-color:#fff;border-radius:50%;animation:spin 0.7s linear infinite;display:inline-block;vertical-align:middle;margin-right:8px; }
+
+  .btn {
+    padding:0.85rem 2rem; border-radius:10px;
+    font-size:0.95rem; font-family:'DM Sans',sans-serif; font-weight:500;
+    cursor:pointer; border:none; transition:all 0.2s; text-decoration:none; display:inline-block;
+  }
+  .btn-primary { background:var(--teal); color:#fff; width:100%; text-align:center; }
+  .btn-primary:hover { background:var(--teal2); transform:translateY(-1px); }
+  .btn-outline { background:transparent; border:1.5px solid rgba(255,255,255,0.2); color:var(--muted); }
+
+  .btn-row { display:flex; gap:1rem; }
+
+  /* Success overlay */
+  .success-screen { display:none; text-align:center; padding:2rem; }
+  .success-icon { font-size:4rem; margin-bottom:1rem; }
+  .success-screen h2 { font-family:'Playfair Display',serif; font-size:1.8rem; margin-bottom:0.5rem; color:var(--success); }
+  .success-screen p { color:var(--muted); margin-bottom:2rem; }
+
+  @media(max-width:500px) { .container { padding:1.5rem 1rem; } }
+</style>
+</head>
+<body>
+
+<nav>
+  <a href="index.html" class="logo">MD<span>Quiz</span></a>
+</nav>
+
+<div class="container">
+
+  <!-- Steps indicator -->
+  <div class="steps">
+    <div class="step done" id="s1">
+      <div class="step-num">✓</div>
+      <div class="step-label">Login</div>
+    </div>
+    <div class="step active" id="s2">
+      <div class="step-num">2</div>
+      <div class="step-label">ទូទាត់</div>
+    </div>
+    <div class="step" id="s3">
+      <div class="step-num">3</div>
+      <div class="step-label">Unlock</div>
+    </div>
+  </div>
+
+  <!-- Payment screen -->
+  <div id="paymentScreen">
+    <h1>Upgrade to Premium</h1>
+    <p class="subtitle">ស្កែន KHQR ហើយទូទាត់ $5.00 — ប្រើបាន ១ ឆ្នាំ</p>
+
+    <div class="qr-card highlight" id="qrCard">
+      <!-- Amount -->
+      <div class="amount-display">
+        <div class="amount-big"><span>$</span>5.00</div>
+        <div class="amount-note">ទូទាត់ម្តង · Renew ឆ្នាំក្រោយ $2 ប៉ុណ្ណោះ</div>
+      </div>
+
+      <!-- QR Code -->
+      <div class="qr-wrap" id="qrWrap">
+        <div class="qr-loader" id="qrLoader">
+          <div class="spinner"></div>
+        </div>
+        <img id="qrImage" src="" alt="KHQR" style="display:none;"/>
+      </div>
+
+      <!-- Merchant name -->
+      <div style="font-size:0.85rem;color:var(--muted);margin:0.5rem 0;">
+        CHAMROEUN by C.CHET
+      </div>
+
+      <!-- Bill Reference -->
+      <div class="bill-ref" id="billRefBox" style="display:none;">
+        📋 លេខយោង (Bill Ref): <strong id="billRefText"></strong>
+        <div style="font-size:0.75rem;color:var(--muted);margin-top:0.4rem;">
+          QR នេះភ្ជាប់ជាមួយ Account របស់អ្នក — Valid 30 នាទី
+        </div>
+      </div>
+    </div>
+
+    <!-- Status -->
+    <div class="status-banner waiting pulse" id="statusBanner">
+      ⏳ កំពុងរង់ចាំការបញ្ជាក់ការទូទាត់...
+    </div>
+
+    <!-- Instructions -->
+    <div class="instructions">
+      <h3>របៀបទូទាត់</h3>
+      <ul class="step-list">
+        <li><span class="num">1</span><span>បើ ABA Mobile / Wing / KHQR app</span></li>
+        <li><span class="num">2</span><span>Scan QR ខាងលើ</span></li>
+        <li><span class="num">3</span><span>បញ្ជាក់ Amount <strong>$5.00</strong></span></li>
+        <li><span class="num">4</span><span>ទូទាត់ → Quiz នឹង Unlock ស្វ័យប្រវត្តិ ~5 វិនាទី</span></li>
+      </ul>
+    </div>
+
+    <div class="btn-row">
+      <a href="dashboard.html" class="btn btn-outline" style="flex:1;text-align:center;">← ត្រឡប់</a>
+      <button class="btn btn-primary" onclick="refreshOrder()" style="flex:2;">🔄 បង្កើត QR ថ្មី</button>
+    </div>
+  </div>
+
+  <!-- Success screen (shown after payment) -->
+  <div class="success-screen" id="successScreen">
+    <div class="success-icon">🎉</div>
+    <h2>ការទូទាត់ជោគជ័យ!</h2>
+    <p>MD Quiz Premium បានបើកហើយ — ប្រើបានគ្រប់ Subjects ១ ឆ្នាំ</p>
+    <a href="dashboard.html" class="btn btn-primary">ទៅ Dashboard →</a>
+  </div>
+
+</div>
+
+<script>
+  const API = 'https://sudo-suspend-1-service.onrender.com';
+
+  const token = localStorage.getItem('token');
+  const user  = JSON.parse(localStorage.getItem('user') || 'null');
+
+  if (!token || !user) { window.location.href = 'login.html'; }
+  if (user?.isPremium)  { window.location.href = 'dashboard.html'; }
+
+  let currentBillRef = null;
+  let pollInterval   = null;
+
+  // ── WebSocket — real-time payment notification ──
+  const socket = io(API);
+
+  socket.on('connect', () => {
+    socket.emit('register', user.id);
+    console.log('🔌 WebSocket connected');
+  });
+
+  socket.on('payment_confirmed', (data) => {
+    console.log('✅ Payment confirmed via WebSocket!', data);
+    onPaymentSuccess();
+  });
+
+  // ── Generate Order on load ──
+  window.onload = () => createOrder();
+
+  async function createOrder() {
+    try {
+      document.getElementById('qrLoader').style.display = 'flex';
+      document.getElementById('qrImage').style.display  = 'none';
+      document.getElementById('billRefBox').style.display = 'none';
+      document.getElementById('statusBanner').className = 'status-banner waiting pulse';
+      document.getElementById('statusBanner').textContent = '⏳ កំពុងបង្កើត QR...';
+
+      const res  = await fetch(`${API}/api/create-order`, {
+        method: 'POST',
+        headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' }
+      });
+      const data = await res.json();
+
+      if (!res.ok) {
+        if (data.error === 'Already Premium!') {
+          window.location.href = 'dashboard.html';
+          return;
+        }
+        throw new Error(data.error);
+      }
+
+      currentBillRef = data.billRef;
+
+      // Show Bill Ref
+      document.getElementById('billRefText').textContent = data.billRef;
+      document.getElementById('billRefBox').style.display = 'block';
+
+      // Generate QR image (demo: QR of billRef)
+      // In production: use real KHQR from ABA PayWay
+      const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent('KHQR:' + data.billRef + ':5.00:USD')}`;
+      const img   = document.getElementById('qrImage');
+      img.onload  = () => {
+        document.getElementById('qrLoader').style.display = 'none';
+        img.style.display = 'block';
+      };
+      img.src = qrUrl;
+
+      // Update status
+      document.getElementById('statusBanner').className  = 'status-banner waiting pulse';
+      document.getElementById('statusBanner').textContent = '⏳ កំពុងរង់ចាំការបញ្ជាក់ការទូទាត់...';
+
+      // Start polling as fallback (every 5s)
+      clearInterval(pollInterval);
+      pollInterval = setInterval(checkStatus, 5000);
+
+    } catch (err) {
+      document.getElementById('statusBanner').className  = 'status-banner error';
+      document.getElementById('statusBanner').textContent = '❌ ' + err.message;
+    }
+  }
+
+  async function checkStatus() {
+    if (!currentBillRef) return;
+    try {
+      const res  = await fetch(`${API}/api/order-status/${currentBillRef}`, {
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      const data = await res.json();
+      if (data.status === 'completed') {
+        clearInterval(pollInterval);
+        onPaymentSuccess();
+      }
+    } catch (e) { /* silent */ }
+  }
+
+  function onPaymentSuccess() {
+    clearInterval(pollInterval);
+
+    // Update local storage
+    if (user) {
+      user.isPremium = true;
+      localStorage.setItem('user', JSON.stringify(user));
+    }
+
+    // Show success screen
+    document.getElementById('paymentScreen').style.display = 'none';
+    document.getElementById('successScreen').style.display = 'block';
+
+    // Update steps
+    document.getElementById('s2').className = 'step done';
+    document.getElementById('s2').querySelector('.step-num').textContent = '✓';
+    document.getElementById('s3').className = 'step active';
+
+    // Auto redirect after 3s
+    setTimeout(() => window.location.href = 'dashboard.html', 3000);
+  }
+
+  function refreshOrder() {
+    clearInterval(pollInterval);
+    createOrder();
+  }
+</script>
+</body>
+</html>
