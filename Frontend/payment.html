@@ -36,148 +36,79 @@
 
   /* Steps */
   .steps { display:flex; justify-content:center; gap:0; margin-bottom:2.5rem; }
-  .step {
-    display:flex; flex-direction:column; align-items:center; gap:0.4rem;
-    flex:1; max-width:140px; position:relative;
-  }
-  .step:not(:last-child)::after {
-    content:'';
-    position:absolute; top:16px; left:calc(50% + 20px);
-    width:calc(100% - 40px); height:1px;
-    background:rgba(255,255,255,0.15);
-  }
+  .step { display:flex; flex-direction:column; align-items:center; gap:0.4rem; flex:1; max-width:140px; position:relative; }
+  .step:not(:last-child)::after { content:''; position:absolute; top:16px; left:calc(50% + 20px); width:calc(100% - 40px); height:1px; background:rgba(255,255,255,0.15); }
   .step.done::after { background:var(--teal); }
-  .step-num {
-    width:32px; height:32px; border-radius:50%;
-    background:rgba(255,255,255,0.1); border:1.5px solid rgba(255,255,255,0.2);
-    display:flex; align-items:center; justify-content:center;
-    font-size:0.82rem; font-weight:500; position:relative; z-index:1;
-  }
+  .step-num { width:32px; height:32px; border-radius:50%; background:rgba(255,255,255,0.1); border:1.5px solid rgba(255,255,255,0.2); display:flex; align-items:center; justify-content:center; font-size:0.82rem; font-weight:500; position:relative; z-index:1; }
   .step.active .step-num { background:var(--teal); border-color:var(--teal); }
-  .step.done   .step-num { background:var(--success); border-color:var(--success); }
+  .step.done .step-num { background:var(--success); border-color:var(--success); }
   .step-label { font-size:0.72rem; color:var(--muted); text-align:center; }
   .step.active .step-label { color:var(--teal2); }
 
   /* QR Card */
-  .qr-card {
-    background:var(--card);
-    border:1.5px solid rgba(255,255,255,0.08);
-    border-radius:20px;
-    padding:2rem;
-    text-align:center;
-    margin-bottom:1.5rem;
-  }
-  .qr-card.highlight { border-color:var(--teal); }
+  .qr-card { background:var(--card); border:1.5px solid var(--teal); border-radius:20px; padding:2rem; text-align:center; margin-bottom:1.5rem; position:relative; overflow:hidden; }
+  .qr-card::before { content:''; position:absolute; top:0; left:0; right:0; height:2px; background:linear-gradient(90deg, var(--teal), var(--gold)); }
 
-  .amount-display {
-    margin-bottom:1.5rem;
-  }
-  .amount-big {
-    font-family:'Playfair Display',serif;
-    font-size:3rem;
-    color:var(--teal2);
-    line-height:1;
-  }
+  .amount-display { margin-bottom:1.5rem; }
+  .amount-big { font-family:'Playfair Display',serif; font-size:3rem; color:var(--teal2); line-height:1; }
   .amount-big span { font-size:1.4rem; vertical-align:top; margin-top:0.7rem; display:inline-block; }
   .amount-note { color:var(--muted); font-size:0.82rem; margin-top:0.4rem; }
 
-  /* QR Code area */
-  .qr-wrap {
-    background:#fff;
-    border-radius:16px;
-    padding:1.2rem;
-    display:inline-block;
-    margin:1rem 0;
-    position:relative;
-  }
-  .qr-wrap img { display:block; width:180px; height:180px; }
-  .qr-loader {
-    width:180px; height:180px;
-    display:flex; align-items:center; justify-content:center;
-    background:#f5f5f5; border-radius:8px;
-  }
+  /* QR Image */
+  .qr-wrap { background:#fff; border-radius:16px; padding:1rem; display:inline-block; margin:1rem 0; }
+  .qr-wrap img { display:block; width:200px; height:200px; border-radius:8px; }
+
+  /* Merchant */
+  .merchant { font-size:0.88rem; color:var(--muted); margin:0.3rem 0 1rem; }
 
   /* Bill Ref */
-  .bill-ref {
-    background:rgba(14,159,142,0.1);
-    border:1px solid rgba(14,159,142,0.3);
-    border-radius:10px;
-    padding:0.8rem 1.2rem;
-    margin:1rem 0;
-    font-size:0.85rem;
+  .bill-ref { background:rgba(14,159,142,0.1); border:1px solid rgba(14,159,142,0.3); border-radius:10px; padding:0.8rem 1.2rem; margin:0.5rem 0 1rem; }
+  .bill-ref-label { font-size:0.75rem; color:var(--muted); margin-bottom:0.3rem; }
+  .bill-ref-code { font-family:monospace; color:var(--teal2); font-size:0.9rem; font-weight:500; word-break:break-all; }
+  .bill-ref-note { font-size:0.72rem; color:var(--muted); margin-top:0.3rem; }
+
+  /* ABA Button */
+  .aba-btn {
+    display:inline-flex; align-items:center; gap:0.6rem;
+    background: linear-gradient(135deg, #003087, #0057b8);
+    color:#fff; border:none; border-radius:12px;
+    padding:0.85rem 2rem; font-size:0.95rem;
+    font-family:'DM Sans',sans-serif; font-weight:500;
+    cursor:pointer; text-decoration:none;
+    transition:all 0.2s; margin:0.5rem 0;
+    width:100%; justify-content:center;
   }
-  .bill-ref strong { color:var(--teal2); font-family:monospace; font-size:0.95rem; }
+  .aba-btn:hover { opacity:0.9; transform:translateY(-1px); }
+
+  /* Status */
+  .status-banner { border-radius:12px; padding:1rem 1.5rem; text-align:center; font-size:0.9rem; margin-bottom:1.2rem; display:none; }
+  .status-banner.waiting { background:rgba(201,168,76,0.12); border:1px solid rgba(201,168,76,0.3); color:var(--gold); display:block; }
+  .status-banner.success { background:rgba(47,200,122,0.15); border:1px solid rgba(47,200,122,0.4); color:var(--success); display:block; }
+  .status-banner.error   { background:rgba(224,92,92,0.12); border:1px solid rgba(224,92,92,0.3); color:var(--error); display:block; }
+
+  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.5} }
+  .pulse { animation:pulse 1.8s ease-in-out infinite; }
+  @keyframes spin { to{transform:rotate(360deg)} }
+  .spinner { width:18px;height:18px;border:2px solid rgba(255,255,255,0.2);border-top-color:#fff;border-radius:50%;animation:spin 0.7s linear infinite;display:inline-block;vertical-align:middle;margin-right:6px; }
 
   /* Instructions */
-  .instructions {
-    background:rgba(255,255,255,0.03);
-    border-radius:12px;
-    padding:1.2rem 1.5rem;
-    text-align:left;
-    margin-bottom:1.5rem;
-  }
-  .instructions h3 { font-size:0.88rem; color:var(--muted); margin-bottom:0.8rem; text-transform:uppercase; letter-spacing:0.5px; }
+  .instructions { background:rgba(255,255,255,0.03); border-radius:12px; padding:1.2rem 1.5rem; text-align:left; margin-bottom:1.5rem; }
+  .instructions h3 { font-size:0.78rem; color:var(--muted); margin-bottom:0.8rem; text-transform:uppercase; letter-spacing:0.5px; }
   .step-list { list-style:none; display:flex; flex-direction:column; gap:0.6rem; }
-  .step-list li { font-size:0.9rem; display:flex; gap:0.7rem; align-items:flex-start; }
-  .step-list li .num {
-    min-width:22px; height:22px; border-radius:50%;
-    background:var(--teal); color:#fff;
-    font-size:0.72rem; display:flex; align-items:center; justify-content:center;
-    margin-top:1px; flex-shrink:0;
-  }
+  .step-list li { font-size:0.88rem; display:flex; gap:0.7rem; align-items:flex-start; }
+  .step-num-sm { min-width:22px; height:22px; border-radius:50%; background:var(--teal); color:#fff; font-size:0.72rem; display:flex; align-items:center; justify-content:center; flex-shrink:0; margin-top:1px; }
 
-  /* Status Banner */
-  .status-banner {
-    border-radius:12px;
-    padding:1rem 1.5rem;
-    text-align:center;
-    font-size:0.95rem;
-    margin-bottom:1.5rem;
-    display:none;
-  }
-  .status-banner.waiting {
-    background:rgba(201,168,76,0.12);
-    border:1px solid rgba(201,168,76,0.3);
-    color:var(--gold);
-    display:block;
-  }
-  .status-banner.success {
-    background:rgba(47,200,122,0.15);
-    border:1px solid rgba(47,200,122,0.4);
-    color:var(--success);
-    display:block;
-  }
-  .status-banner.error {
-    background:rgba(224,92,92,0.12);
-    border:1px solid rgba(224,92,92,0.3);
-    color:var(--error);
-    display:block;
-  }
-
-  /* Pulse animation for waiting */
-  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.5} }
-  .pulse { animation:pulse 1.5s ease-in-out infinite; }
-
-  /* Spinner */
-  @keyframes spin { to{transform:rotate(360deg)} }
-  .spinner { width:20px;height:20px;border:2px solid rgba(255,255,255,0.2);border-top-color:#fff;border-radius:50%;animation:spin 0.7s linear infinite;display:inline-block;vertical-align:middle;margin-right:8px; }
-
-  .btn {
-    padding:0.85rem 2rem; border-radius:10px;
-    font-size:0.95rem; font-family:'DM Sans',sans-serif; font-weight:500;
-    cursor:pointer; border:none; transition:all 0.2s; text-decoration:none; display:inline-block;
-  }
-  .btn-primary { background:var(--teal); color:#fff; width:100%; text-align:center; }
-  .btn-primary:hover { background:var(--teal2); transform:translateY(-1px); }
+  .btn { padding:0.8rem 1.5rem; border-radius:10px; font-size:0.9rem; font-family:'DM Sans',sans-serif; font-weight:500; cursor:pointer; border:none; transition:all 0.2s; text-decoration:none; display:inline-block; }
   .btn-outline { background:transparent; border:1.5px solid rgba(255,255,255,0.2); color:var(--muted); }
-
   .btn-row { display:flex; gap:1rem; }
 
-  /* Success overlay */
+  /* Success */
   .success-screen { display:none; text-align:center; padding:2rem; }
   .success-icon { font-size:4rem; margin-bottom:1rem; }
   .success-screen h2 { font-family:'Playfair Display',serif; font-size:1.8rem; margin-bottom:0.5rem; color:var(--success); }
   .success-screen p { color:var(--muted); margin-bottom:2rem; }
+  .btn-primary { background:var(--teal); color:#fff; width:100%; text-align:center; }
+  .btn-primary:hover { background:var(--teal2); }
 
   @media(max-width:500px) { .container { padding:1.5rem 1rem; } }
 </style>
@@ -190,54 +121,45 @@
 
 <div class="container">
 
-  <!-- Steps indicator -->
   <div class="steps">
-    <div class="step done" id="s1">
-      <div class="step-num">✓</div>
-      <div class="step-label">Login</div>
-    </div>
-    <div class="step active" id="s2">
-      <div class="step-num">2</div>
-      <div class="step-label">ទូទាត់</div>
-    </div>
-    <div class="step" id="s3">
-      <div class="step-num">3</div>
-      <div class="step-label">Unlock</div>
-    </div>
+    <div class="step done" id="s1"><div class="step-num">✓</div><div class="step-label">Login</div></div>
+    <div class="step active" id="s2"><div class="step-num">2</div><div class="step-label">ទូទាត់</div></div>
+    <div class="step" id="s3"><div class="step-num">3</div><div class="step-label">Unlock</div></div>
   </div>
 
-  <!-- Payment screen -->
+  <!-- Payment Screen -->
   <div id="paymentScreen">
     <h1>Upgrade to Premium</h1>
-    <p class="subtitle">ស្កែន KHQR ហើយទូទាត់ $5.00 — ប្រើបាន ១ ឆ្នាំ</p>
+    <p class="subtitle">ស្កែន KHQR ឬ Click ABA Pay — ទូទាត់ $5.00 — ប្រើបាន ១ ឆ្នាំ</p>
 
-    <div class="qr-card highlight" id="qrCard">
-      <!-- Amount -->
+    <div class="qr-card">
       <div class="amount-display">
         <div class="amount-big"><span>$</span>5.00</div>
         <div class="amount-note">ទូទាត់ម្តង · Renew ឆ្នាំក្រោយ $2 ប៉ុណ្ណោះ</div>
       </div>
 
-      <!-- QR Code -->
-      <div class="qr-wrap" id="qrWrap">
-        <div class="qr-loader" id="qrLoader">
-          <div class="spinner"></div>
-        </div>
-        <img id="qrImage" src="" alt="KHQR" style="display:none;"/>
+      <!-- Real ABA KHQR image -->
+      <div class="qr-wrap">
+        <img id="qrImage"
+          src="https://link.payway.com.kh/ABAPAYpr425577o"
+          alt="ABA KHQR"
+          onerror="this.src='https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=https://link.payway.com.kh/ABAPAYpr425577o'"
+        />
       </div>
 
-      <!-- Merchant name -->
-      <div style="font-size:0.85rem;color:var(--muted);margin:0.5rem 0;">
-        CHAMROEUN by C.CHET
-      </div>
+      <div class="merchant">🏪 CHAMROEUN by C.CHET</div>
 
       <!-- Bill Reference -->
       <div class="bill-ref" id="billRefBox" style="display:none;">
-        📋 លេខយោង (Bill Ref): <strong id="billRefText"></strong>
-        <div style="font-size:0.75rem;color:var(--muted);margin-top:0.4rem;">
-          QR នេះភ្ជាប់ជាមួយ Account របស់អ្នក — Valid 30 នាទី
-        </div>
+        <div class="bill-ref-label">📋 លេខយោងការទូទាត់ (Bill Reference)</div>
+        <div class="bill-ref-code" id="billRefText">កំពុងបង្កើត...</div>
+        <div class="bill-ref-note">⚠️ សូម Screenshot និង រក្សា Ref នេះ ពេល Transfer</div>
       </div>
+
+      <!-- ABA Deep Link Button -->
+      <a href="https://link.payway.com.kh/ABAPAYpr425577o" class="aba-btn" target="_blank">
+        💳 បើ ABA Mobile — ទូទាត់ភ្លាម
+      </a>
     </div>
 
     <!-- Status -->
@@ -249,20 +171,20 @@
     <div class="instructions">
       <h3>របៀបទូទាត់</h3>
       <ul class="step-list">
-        <li><span class="num">1</span><span>បើ ABA Mobile / Wing / KHQR app</span></li>
-        <li><span class="num">2</span><span>Scan QR ខាងលើ</span></li>
-        <li><span class="num">3</span><span>បញ្ជាក់ Amount <strong>$5.00</strong></span></li>
-        <li><span class="num">4</span><span>ទូទាត់ → Quiz នឹង Unlock ស្វ័យប្រវត្តិ ~5 វិនាទី</span></li>
+        <li><span class="step-num-sm">1</span><span>Click "បើ ABA Mobile" ខាងលើ ឬ Scan QR ដោយ app</span></li>
+        <li><span class="step-num-sm">2</span><span>បញ្ជាក់ Amount <strong>$5.00</strong> → Transfer</span></li>
+        <li><span class="step-num-sm">3</span><span>រង់ចាំ ~5 វិនាទី → Quiz Unlock ស្វ័យប្រវត្តិ ✅</span></li>
+        <li><span class="step-num-sm">4</span><span>បើ មិន Unlock → Contact Admin ជាមួយ Bill Ref</span></li>
       </ul>
     </div>
 
     <div class="btn-row">
       <a href="dashboard.html" class="btn btn-outline" style="flex:1;text-align:center;">← ត្រឡប់</a>
-      <button class="btn btn-primary" onclick="refreshOrder()" style="flex:2;">🔄 បង្កើត QR ថ្មី</button>
+      <button class="btn btn-primary" onclick="refreshOrder()" style="flex:2;">🔄 Refresh QR</button>
     </div>
   </div>
 
-  <!-- Success screen (shown after payment) -->
+  <!-- Success Screen -->
   <div class="success-screen" id="successScreen">
     <div class="success-icon">🎉</div>
     <h2>ការទូទាត់ជោគជ័យ!</h2>
@@ -273,8 +195,7 @@
 </div>
 
 <script>
-  const API = 'https://sudo-suspend-1-service.onrender.com';
-
+  const API   = 'https://sudo-suspend-1-service.onrender.com';
   const token = localStorage.getItem('token');
   const user  = JSON.parse(localStorage.getItem('user') || 'null');
 
@@ -284,30 +205,18 @@
   let currentBillRef = null;
   let pollInterval   = null;
 
-  // ── WebSocket — real-time payment notification ──
-  const socket = io(API);
-
+  // ── WebSocket ──
+  const socket = io(API, { transports: ['websocket', 'polling'] });
   socket.on('connect', () => {
     socket.emit('register', user.id);
-    console.log('🔌 WebSocket connected');
   });
+  socket.on('payment_confirmed', () => onPaymentSuccess());
 
-  socket.on('payment_confirmed', (data) => {
-    console.log('✅ Payment confirmed via WebSocket!', data);
-    onPaymentSuccess();
-  });
-
-  // ── Generate Order on load ──
+  // ── Create Order on load ──
   window.onload = () => createOrder();
 
   async function createOrder() {
     try {
-      document.getElementById('qrLoader').style.display = 'flex';
-      document.getElementById('qrImage').style.display  = 'none';
-      document.getElementById('billRefBox').style.display = 'none';
-      document.getElementById('statusBanner').className = 'status-banner waiting pulse';
-      document.getElementById('statusBanner').textContent = '⏳ កំពុងបង្កើត QR...';
-
       const res  = await fetch(`${API}/api/create-order`, {
         method: 'POST',
         headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' }
@@ -315,40 +224,21 @@
       const data = await res.json();
 
       if (!res.ok) {
-        if (data.error === 'Already Premium!') {
-          window.location.href = 'dashboard.html';
-          return;
-        }
-        throw new Error(data.error);
+        if (data.error === 'Already Premium!') { window.location.href = 'dashboard.html'; return; }
+        console.error('Order error:', data.error);
+        return;
       }
 
       currentBillRef = data.billRef;
-
-      // Show Bill Ref
       document.getElementById('billRefText').textContent = data.billRef;
       document.getElementById('billRefBox').style.display = 'block';
 
-      // Generate QR image (demo: QR of billRef)
-      // In production: use real KHQR from ABA PayWay
-      const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent('KHQR:' + data.billRef + ':5.00:USD')}`;
-      const img   = document.getElementById('qrImage');
-      img.onload  = () => {
-        document.getElementById('qrLoader').style.display = 'none';
-        img.style.display = 'block';
-      };
-      img.src = qrUrl;
-
-      // Update status
-      document.getElementById('statusBanner').className  = 'status-banner waiting pulse';
-      document.getElementById('statusBanner').textContent = '⏳ កំពុងរង់ចាំការបញ្ជាក់ការទូទាត់...';
-
-      // Start polling as fallback (every 5s)
+      // Start polling every 5s as fallback
       clearInterval(pollInterval);
       pollInterval = setInterval(checkStatus, 5000);
 
     } catch (err) {
-      document.getElementById('statusBanner').className  = 'status-banner error';
-      document.getElementById('statusBanner').textContent = '❌ ' + err.message;
+      console.error('Create order error:', err);
     }
   }
 
@@ -363,28 +253,17 @@
         clearInterval(pollInterval);
         onPaymentSuccess();
       }
-    } catch (e) { /* silent */ }
+    } catch (e) {}
   }
 
   function onPaymentSuccess() {
     clearInterval(pollInterval);
-
-    // Update local storage
-    if (user) {
-      user.isPremium = true;
-      localStorage.setItem('user', JSON.stringify(user));
-    }
-
-    // Show success screen
-    document.getElementById('paymentScreen').style.display = 'none';
-    document.getElementById('successScreen').style.display = 'block';
-
-    // Update steps
+    if (user) { user.isPremium = true; localStorage.setItem('user', JSON.stringify(user)); }
+    document.getElementById('paymentScreen').style.display  = 'none';
+    document.getElementById('successScreen').style.display  = 'block';
     document.getElementById('s2').className = 'step done';
     document.getElementById('s2').querySelector('.step-num').textContent = '✓';
     document.getElementById('s3').className = 'step active';
-
-    // Auto redirect after 3s
     setTimeout(() => window.location.href = 'dashboard.html', 3000);
   }
 
